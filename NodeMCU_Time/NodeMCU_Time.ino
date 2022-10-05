@@ -86,11 +86,12 @@ void loop()
   int currentHour = timeClient.getHours();
   int currentMinute = timeClient.getMinutes();
   int currentSecond = timeClient.getSeconds();
+  Serial.println("outside if water turn on");
   if((currentHour == 18 || currentHour == 6) && currentMinute <=2){ // turn on watering
       digitalWrite(D1, LOW); // here LOW means HIGH somehow they are reversed
   }
   if((currentHour == 18 || currentHour == 6) && currentMinute == 3){ // turn off watering
-    
+      Serial.println("inside if water turn on");
       digitalWrite(D1, HIGH); // same here
   }
   if((currentHour == 20) && currentMinute <= 2){ // turn on light
