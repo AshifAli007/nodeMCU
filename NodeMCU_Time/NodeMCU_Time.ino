@@ -58,6 +58,48 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
 int isHigh = 0;
 int isLow = 0;
+BlynkTimer timer; // Announcing the timer
+BLYNK_WRITE(V1)
+{   
+  int value = param.asInt(); // Get value as integer
+  int x = param[0].asInt();
+  if(x==0){
+    digitalWrite(D3, HIGH);
+  }else if(x==1){
+    digitalWrite(D3, LOW);
+  }
+}
+void sensorDataSend()
+{
+  timeClient.update();
+  int currentHour = timeClient.getHours();
+  int currentMinute = timeClient.getMinutes();
+  int currentSecond = timeClient.getSeconds();
+
+  if((currentHour == 20) && currentMinute <= 2){ // turn on light
+      digitalWrite(D3, LOW); // same here
+      Blynk.virtualWrite(V1, 1);
+  }
+  if((currentHour == 5) && currentMinute >= 30 && currentMinute<=32){ //turn of light
+      digitalWrite(D3, HIGH); // same here
+      Blynk.virtualWrite(V1, 0);
+  }
+//  if(isLow){
+//    digitalWrite(D3, HIGH);
+//    Blynk.virtualWrite(V1, 0);
+//  }else{
+//    digitalWrite(D3, LOW);
+//    Blynk.virtualWrite(V1, 1);
+//  }
+//  isLow = !isLow;
+//  Serial.print(currentHour);
+//  Serial.print(" ");
+//  Serial.print(currentMinute);
+//  Serial.print(" ");
+//  Serial.print(currentSecond);
+//  Serial.print(" ");
+//  Serial.println();
+}
 void setup()
 {
   // Debug console
@@ -78,27 +120,28 @@ void setup()
   pinMode(D1, OUTPUT);
   digitalWrite(D1, HIGH);
   digitalWrite(D3, HIGH);
+
+  timer.setInterval(30000L, sensorDataSend);
 }
 
 void loop()
 {
-  timeClient.update();
-  int currentHour = timeClient.getHours();
-  int currentMinute = timeClient.getMinutes();
-  int currentSecond = timeClient.getSeconds();
-  Serial.println("outside if water turn on");
-  if((currentHour == 18 || currentHour == 6) && currentMinute <=2){ // turn on watering
-      digitalWrite(D1, LOW); // here LOW means HIGH somehow they are reversed
-  }
-  if((currentHour == 18 || currentHour == 6) && currentMinute == 3){ // turn off watering
-      Serial.println("inside if water turn on");
-      digitalWrite(D1, HIGH); // same here
-  }
-  if((currentHour == 20) && currentMinute <= 2){ // turn on light
-      digitalWrite(D3, LOW); // same here
-  }
-  if((currentHour == 5) && currentMinute >= 30 && currentMinute<=32){ //turn of light
-      digitalWrite(D3, HIGH); // same here
-  }
+//  if((currentHour == 18 || currentHour == 6) && currentMinute <=2){ // turn on watering
+//      digitalWrite(D1, LOW); // here LOW means HIGH somehow they are reversed
+//  }
+//  if((currentHour == 18 || currentHour == 6) && currentMinute == 3){ // turn off watering
+//      Serial.println("inside if water turn on");
+//      digitalWrite(D1, HIGH); // same here
+//  }
+
+//  if((currentHour == 20) && currentMinute <= 2){ // turn on light
+//      digitalWrite(D3, LOW); // same here
+//  }
+//  if((currentHour == 5) && currentMinute >= 30 && currentMinute<=32){ //turn of light
+//      digitalWrite(D3, HIGH); // same here
+//  }
+
+
   Blynk.run();
+  timer.run(); 
 }
